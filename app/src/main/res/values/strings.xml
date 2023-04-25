@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MapLocationFinder</string>
+    <string name="title_activity_maps">Wanderer</string>
+</resources>
