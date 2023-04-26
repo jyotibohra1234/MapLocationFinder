@@ -20,6 +20,7 @@ import okhttp3.Request
 import java.lang.Exception
 import kotlin.collections.ArrayList
 import com.google.gson.GsonBuilder
+import org.jetbrains.anko.onClick
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -32,7 +33,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         fetchLocation()
+        binding.buttonDirections.onClick {
+
+            // Checks, whether start and end locations are captured
+            if (markerPoints.size >= 2) {
+                val origin = markerPoints[0] as LatLng
+                val dest = markerPoints[1] as LatLng
+                // Getting URL to the Google Directions API for routes
+                val URL = getDirectionUrl(origin,dest)
+                GetDirections(URL).execute()
+            }
+
+        }
     }
+
 
     private fun fetchLocation() {
         if (ActivityCompat.checkSelfPermission(
@@ -101,34 +115,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 markerPoints.add(latLng)
 
                 // Creating MarkerOptions
-                val options = MarkerOptions().title(latLng.latitude.toString() + ":" + latLng.longitude.toString())
+                val options = MarkerOptions().snippet(latLng.latitude.toString() + ":" + latLng.longitude.toString())
                 // Setting the position of the marker
                 options.position(latLng).draggable(true)
 
                 if (markerPoints.size == 1) {
-                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).title("A")
                 } else if (markerPoints.size == 2) {
-                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).title("B")
                 }else if (markerPoints.size == 3) {
-                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).title("C")
                 }else if (markerPoints.size == 4) {
-                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).title("D")
                 }
 
                 // Add new marker to the Google Map Android API V2
-                mMap.addMarker(options)
-
-                // Checks, whether start and end locations are captured
-                if (markerPoints.size >= 2) {
-                    val origin = markerPoints[0] as LatLng
-                    val dest = markerPoints[1] as LatLng
-                    // Getting URL to the Google Directions API for routes
-                    val URL = getDirectionUrl(origin,dest)
-                    GetDirections(URL).execute()
-                }
-
+                sequenceOf(mMap.addMarker(options))
             }
         })
+
     }
 
     private fun getDirectionUrl(from : LatLng, to : LatLng) : String{
